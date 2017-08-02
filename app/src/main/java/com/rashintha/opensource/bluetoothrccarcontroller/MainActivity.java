@@ -2,12 +2,16 @@ package com.rashintha.opensource.bluetoothrccarcontroller;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.util.ArraySet;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -15,14 +19,21 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
+    final int BLUETOOTH_MSG_STATE = 0;
+
     private BluetoothAdapter bluetoothAdapter;
     private ImageButton btnBluetoothEnable;
     private Set<BluetoothDevice> pairedDevices;
+
+    Handler bluetoothHandler;
 
     @Override
     protected void onResume() {
@@ -49,6 +60,17 @@ public class MainActivity extends AppCompatActivity {
         ImageButton btnBluetoothConnect = (ImageButton) findViewById(R.id.btnBluetoothConnect);
         ImageButton btnBluetoothDisconnect = (ImageButton) findViewById(R.id.btnBluetoothDisconnect);
 
+        bluetoothHandler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                if(msg.what == BLUETOOTH_MSG_STATE){
+                    String message = (String) msg.obj;
+
+                    //Handle message
+                }
+            }
+        };
+
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         btnBluetoothEnable.setOnClickListener(new View.OnClickListener() {
@@ -69,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 pairedDevices = bluetoothAdapter.getBondedDevices();
 
                 AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                dialogBuilder.setIcon(R.mipmap.bluetooth_connect);
                 dialogBuilder.setTitle("Select RC Car");
 
                 final ArrayList<String> deviceMACs = new ArrayList<>();
@@ -90,5 +113,50 @@ public class MainActivity extends AppCompatActivity {
                 dialogBuilder.show();
             }
         });
+    }
+
+    private class ConnectedThread extends Thread{
+        private final InputStream inputStream;
+        private final OutputStream outputStream;
+
+        public ConnectedThread(BluetoothSocket socket){
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            try {
+                inputStream = socket.getInputStream();
+                outputStream = socket.getOutputStream();
+            }catch (IOException e){
+                Log.wtf("IO E", "Construct");
+            }
+
+            this.inputStream = inputStream;
+            this.outputStream = outputStream;
+        }
+
+        @Override
+        public void run() {
+            byte[] buffer = new byte[256];
+            int bytes;
+
+            while(true){
+                try {
+                    bytes = inputStream.read(buffer);
+                    String message = new String(buffer, 0, bytes);
+                    bluetoothHandler.obtainMessage(BLUETOOTH_MSG_STATE, bytes, -1, message).sendToTarget();
+                }catch (IOException e){
+                    Log.wtf("IO E", "run");
+                    break;
+                }
+            }
+        }
+
+        public void write(String input){
+            byte[] buffer = input.getBytes();
+            try{
+                outputStream.write(buffer);
+            }catch (IOException e){
+                Log.wtf("IO E", "write");
+            }
+        }
     }
 }

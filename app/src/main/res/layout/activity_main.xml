@@ -50,4 +50,35 @@
         android:layout_centerVertical="true"
         android:background="@mipmap/rc_right_arrow"
         android:layout_marginStart="30dp"/>
+
+    <ImageButton
+        android:id="@+id/btnBluetoothEnable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@mipmap/bluetooth_enable"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="50dp"/>
+
+    <ImageButton
+        android:id="@+id/btnBluetoothConnect"
+        android:layout_toStartOf="@id/btnBluetoothEnable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@mipmap/bluetooth_connect"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="35dp"
+        android:layout_marginEnd="30dp"/>
+
+    <ImageButton
+        android:id="@+id/btnBluetoothDisconnect"
+        android:layout_toEndOf="@id/btnBluetoothEnable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@mipmap/bluetooth_disconnect"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="35dp"
+        android:layout_marginStart="30dp"/>
 </RelativeLayout>

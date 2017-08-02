@@ -2,6 +2,7 @@ package com.rashintha.opensource.bluetoothrccarcontroller;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.util.ArraySet;
 import android.support.v7.app.AlertDialog;
@@ -67,33 +68,26 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 pairedDevices = bluetoothAdapter.getBondedDevices();
 
-                ListView lstDevices = new ListView(getApplicationContext());
+                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                dialogBuilder.setTitle("Select RC Car");
 
                 final ArrayList<String> deviceMACs = new ArrayList<>();
 
-                ArrayAdapter<String> deviceDetails = new ArrayAdapter<>(getApplicationContext(), android.R.layout.select_dialog_item);
+                ArrayAdapter<String> deviceDetails = new ArrayAdapter<>(MainActivity.this, android.R.layout.select_dialog_singlechoice);
 
                 for(BluetoothDevice device : pairedDevices){
                     deviceDetails.add(device.getName() + " " + device.getAddress());
                     deviceMACs.add(device.getAddress());
                 }
 
-                lstDevices.setAdapter(deviceDetails);
-
-                lstDevices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                dialogBuilder.setAdapter(deviceDetails, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Toast.makeText(getApplicationContext(), deviceMACs.get(position), Toast.LENGTH_SHORT).show();
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getApplicationContext(), deviceMACs.get(which), Toast.LENGTH_SHORT).show();
                     }
                 });
 
-                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getApplicationContext());
-                dialogBuilder.setTitle("Select RC Car");
-
-                dialogBuilder.setView(lstDevices);
-
-                AlertDialog dialog = dialogBuilder.show();
-                dialog.show();
+                dialogBuilder.show();
             }
         });
     }

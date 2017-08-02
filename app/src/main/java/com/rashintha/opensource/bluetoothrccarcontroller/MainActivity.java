@@ -12,6 +12,6 @@ public class MainActivity extends AppCompatActivity {
 
         //abc
         String a = "", b;
-        int a;
+        int ab;
     }
 }

@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ConnectedThread connectedThread;
 
+    private String rcStatus = "n";
     Handler bluetoothHandler;
 
     // SPP UUID service
@@ -77,6 +78,28 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
+
+        Thread sendData = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true)
+                    try {
+                        if (socket.isConnected()) {
+                            connectedThread.write(rcStatus);
+                            try {
+                                Thread.sleep(1);
+                            } catch (InterruptedException e) {
+                                Log.wtf("I E", "thread");
+                            }
+                        }
+                    }catch(NullPointerException e){
+                        //If socket is not created yet
+                    }
+            }
+
+        });
+
+        sendData.start();
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 

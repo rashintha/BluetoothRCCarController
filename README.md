@@ -2,4 +2,4 @@
 
 This is an Android app developed to controll RC car using bluetooth. 
 
-<img src="screenshot.png" width="100" />
+<img src="screenshot.png" width="200" />

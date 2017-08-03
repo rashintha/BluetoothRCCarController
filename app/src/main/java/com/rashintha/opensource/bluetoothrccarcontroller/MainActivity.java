@@ -92,6 +92,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        btnBluetoothDisconnect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try{
+                    if(socket.isConnected()) {
+                        socket.close();
+                        Toast.makeText(getApplicationContext(), "Disconnected.", Toast.LENGTH_SHORT).show();
+                    }
+                }catch (IOException e){
+                    Log.wtf("IO E", "Disconnect");
+                }catch (NullPointerException e){
+                    Log.wtf("Null E", "Disconnect");
+                }
+            }
+        });
+
         btnBluetoothConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

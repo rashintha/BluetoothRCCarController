@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,8 +33,14 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter bluetoothAdapter;
     private ImageButton btnBluetoothEnable;
     private Set<BluetoothDevice> pairedDevices;
+    private BluetoothSocket socket;
+
+    private ConnectedThread connectedThread;
 
     Handler bluetoothHandler;
+
+    // SPP UUID service
+    private static final UUID BTMODULEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     @Override
     protected void onResume() {
@@ -106,13 +113,39 @@ public class MainActivity extends AppCompatActivity {
                 dialogBuilder.setAdapter(deviceDetails, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(getApplicationContext(), deviceMACs.get(which), Toast.LENGTH_SHORT).show();
+                        BluetoothDevice device = bluetoothAdapter.getRemoteDevice(deviceMACs.get(which));
+
+                        try {
+                            socket = createBluetoothSocket(device);
+                        }catch (IOException e){
+                            Log.wtf("IO E", "create socket");
+                        }
+
+                        try {
+                            socket.connect();
+                        }catch (IOException e){
+                            Log.wtf("IO E", "Connect");
+                            try {
+                                socket.close();
+                            }catch (IOException er){
+                                Log.wtf("IO E", "Close");
+                            }
+                        }
+
+                        connectedThread = new ConnectedThread(socket);
+                        connectedThread.start();
                     }
                 });
 
                 dialogBuilder.show();
             }
         });
+    }
+
+    private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
+
+        return  device.createRfcommSocketToServiceRecord(BTMODULEUUID);
+        //creates secure outgoing connecetion with BT device using UUID
     }
 
     private class ConnectedThread extends Thread{

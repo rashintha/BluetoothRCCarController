@@ -1,5 +1,5 @@
 # Bluetooth RC Car Controller (Android)
 
-Copyright © Rashintha Maduneth 2017
+This is an Android app developed to controll RC car using bluetooth. 
 
-This is an Andorid app for controlling RC car via bluetooth. Feel free to modify this project.
+![Screenshot](screenshot.png)

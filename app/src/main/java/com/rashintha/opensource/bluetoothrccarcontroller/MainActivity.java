@@ -12,6 +12,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -67,6 +68,81 @@ public class MainActivity extends AppCompatActivity {
         btnBluetoothEnable = (ImageButton) findViewById(R.id.btnBluetoothEnable);
         ImageButton btnBluetoothConnect = (ImageButton) findViewById(R.id.btnBluetoothConnect);
         ImageButton btnBluetoothDisconnect = (ImageButton) findViewById(R.id.btnBluetoothDisconnect);
+
+        btnRight.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()){
+                    case MotionEvent.ACTION_DOWN:
+                        rcStatus = "r";
+                        return  true;
+                    case MotionEvent.ACTION_UP:
+                        rcStatus = "n";
+                        return  true;
+                }
+                return false;
+            }
+        });
+
+        btnLeft.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()){
+                    case MotionEvent.ACTION_DOWN:
+                        rcStatus = "l";
+                        return  true;
+                    case MotionEvent.ACTION_UP:
+                        rcStatus = "n";
+                        return  true;
+                }
+                return false;
+            }
+        });
+
+        btnUp.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()){
+                    case MotionEvent.ACTION_DOWN:
+                        rcStatus = "u";
+                        return  true;
+                    case MotionEvent.ACTION_UP:
+                        rcStatus = "n";
+                        return  true;
+                }
+                return false;
+            }
+        });
+
+        btnStop.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()){
+                    case MotionEvent.ACTION_DOWN:
+                        rcStatus = "s";
+                        return  true;
+                    case MotionEvent.ACTION_UP:
+                        rcStatus = "n";
+                        return  true;
+                }
+                return false;
+            }
+        });
+
+        btnDown.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()){
+                    case MotionEvent.ACTION_DOWN:
+                        rcStatus = "d";
+                        return  true;
+                    case MotionEvent.ACTION_UP:
+                        rcStatus = "n";
+                        return  true;
+                }
+                return false;
+            }
+        });
 
         bluetoothHandler = new Handler(){
             @Override
@@ -134,6 +210,16 @@ public class MainActivity extends AppCompatActivity {
         btnBluetoothConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                try{
+                    if(socket.isConnected()) {
+                        Toast.makeText(getApplicationContext(), "Already Connected. Disconnect before reconnect.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }catch (NullPointerException e){
+                    Log.wtf("Null", "Connect");
+                }
+
                 pairedDevices = bluetoothAdapter.getBondedDevices();
 
                 AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
@@ -162,11 +248,14 @@ public class MainActivity extends AppCompatActivity {
 
                         try {
                             socket.connect();
+                            Toast.makeText(getApplicationContext(), "Connected.", Toast.LENGTH_SHORT).show();
                         }catch (IOException e){
                             Log.wtf("IO E", "Connect");
+
+                            Toast.makeText(getApplicationContext(), "Connection Error.", Toast.LENGTH_SHORT).show();
                             try {
                                 socket.close();
-                            }catch (IOException er){
+                            } catch (IOException er) {
                                 Log.wtf("IO E", "Close");
                             }
                         }
